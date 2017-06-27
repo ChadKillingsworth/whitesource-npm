@@ -245,3 +245,76 @@ WsNodeReportBuilder.traverseLsJson = function(allDependencies){
   	return WsNodeReportBuilder.refitNodes(parseData);
 };
 
+WsNodeReportBuilder.traverseYarnData = function(lsDeps, yarnDependencies){
+	cli.ok("Building dependencies report");
+
+	// Build a map of dependencies and specific versions from the yarn.lock file data
+	var yarnDependenciesMap = {};
+	for (let depName in yarnDependencies) {
+		if (!Object.hasOwnProperty.call(yarnDependencies, depName)) {
+			continue;
+		}
+
+		const packageSeparatorIndex = depName.lastIndexOf('@');
+		let packageName = depName;
+		const details = yarnDependencies[depName];
+		if (packageSeparatorIndex > 0) {
+			packageName = depName.substr(0, packageSeparatorIndex);
+		}
+
+		let packageInfo = yarnDependenciesMap[packageName];
+		if (!packageInfo) {
+			packageInfo = yarnDependenciesMap[packageName] = {};
+		}
+
+		if (details.version in packageInfo) {
+			// We've already seen this package version
+			continue;
+		}
+
+		let shasum = null;
+		let hashIndex = details.resolved.indexOf('#');
+		let url = details.resolved;
+		if (hashIndex > 0) {
+			shasum = details.resolved.substr(hashIndex + 1);
+			url = details.resolved.substr(0, hashIndex);
+		}
+
+		packageInfo[details.version] = {
+			resolved: details.resolved,
+			shasum,
+			sha1: shasum,
+			artifactId: url
+		};
+	}
+
+	// augument the missing npm ls data with the yarn.lock file data
+	function augmentDepInfo(details, name) {
+		if (name) {
+			if (!(name in yarnDependenciesMap)) {
+				console.error('Missing yarn dependency:', name);
+				return;
+			}
+			if (!(details.version in yarnDependenciesMap[name])) {
+				console.error('Missing yarn dependency version:', name, version);
+				return;
+			}
+			
+			Object.assign(details, yarnDependenciesMap[name][details.version]);
+			delete details.resolved;
+			details.from = name + '@' + details.version;
+		}
+		if (details.dependencies) {
+			for (let subDepName in details.dependencies) {
+				if (!Object.hasOwnProperty.call(details.dependencies, subDepName)) {
+					continue;
+				}
+				augmentDepInfo(details.dependencies[subDepName], subDepName);
+			}
+		}
+	}
+	augmentDepInfo(lsDeps);
+	
+	return WsNodeReportBuilder.refitNodes(lsDeps);
+};
+

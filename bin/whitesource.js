@@ -8,6 +8,7 @@ var shell = require('shelljs/global');
 var cli = require('cli');
 var fs = require('fs');
 var checksum = require('checksum');
+var yarnParser = require('parse-yarn-lock');
 
 var prompt = require('prompt');
 prompt.message = "whitesource";
@@ -200,7 +201,7 @@ var buildReport = function(lsJson){
 };
 
 
-cli.parse(null, ['bower','run']);
+cli.parse(null, ['bower','run', 'yarn']);
 cli.main(function (args, options){
 	var confPath = './whitesource.config.json';
 	if (options.hasOwnProperty('c') && options.c && args.length > 0) {
@@ -214,6 +215,7 @@ cli.main(function (args, options){
 	var lsFailMsg = 'Failed to run NPM ls, \n make sure to run NPM install prior to running whitesource, \n if this problem continues please check your Package.json for invalid configurations'
 	var devDepMsg = 'If you have installed Dev Dependencies and like to include them in the whitesource report,\n add devDep flag to the whitesource.config file to continue.'
 	var missingPackgeJsonMsg = 'Missing Package.json file. \n whitesource requires a valid package.json file to proceed';
+	var missingYarnLockMsg = 'Missing yarn.lock file. \n whitesource requires a valid yarn.lock file to proceed';
 
 	deletePluginFiles();
 
@@ -227,11 +229,11 @@ cli.main(function (args, options){
 
 		var cmd = (confJson.devDep === true) ? 'npm ls --json > ./ws-ls.json' : 'npm ls --json --only=prod > ./ws-ls.json';
 		exec(cmd,function(error, stdout, stderr){
-		    if (error != 0){
-		    	cli.ok('exec error: ', error);
-		    	cli.error(devDepMsg);
-		    	cli.fatal(lsFailMsg);
-		    } else {
+			if (error != 0){
+				cli.ok('exec error: ', error);
+				cli.error(devDepMsg);
+				cli.fatal(lsFailMsg);
+			} else {
 				cli.ok('Done calculation dependencies!');
 
 				var lsResult = JSON.parse(fs.readFileSync("./ws-ls.json", 'utf8'));
@@ -241,7 +243,42 @@ cli.main(function (args, options){
 				WsHelper.saveReportFile(json,constants.NPM_REPORT_NAME);
 
 				postReportToWs(json,confJson);
-		    }
+			}
+		});
+	}
+
+	if(cli.command === "yarn"){
+		runtimeMode = "node";
+		cli.ok('Running whitesource...');
+		var hasPackageJson = WsHelper.hasFile('./package.json');
+		if(!hasPackageJson){
+			cli.fatal(missingPackgeJsonMsg);
+		}
+
+		var hasYarnLock = WsHelper.hasFile('./yarn.lock');
+		if(!hasYarnLock){
+			cli.fatal(missingYarnLockMsg);
+		}
+		var yarnLockData = fs.readFileSync('./yarn.lock', {encoding: 'utf8'});
+		yarnParser.parse(yarnLockData, function(err, yarnData) {
+			var cmd = (confJson.devDep === true) ? 'npm ls --json > ./ws-ls.json' : 'npm ls --json --only=prod > ./ws-ls.json';
+			exec(cmd,function(error, stdout, stderr){
+				if (error != 0){
+					cli.ok('exec error: ', error);
+					cli.error(devDepMsg);
+					cli.fatal(lsFailMsg);
+				} else {
+					cli.ok('Done calculation dependencies!');
+
+					var lsResult = JSON.parse(fs.readFileSync("./ws-ls.json", 'utf8'));
+					var json = WsNodeReportBuilder.traverseYarnData(lsResult, yarnData);
+
+					cli.ok("Saving dependencies report");
+					WsHelper.saveReportFile(json,constants.NPM_REPORT_NAME);
+
+					postReportToWs(json,confJson);
+				}
+			});
 		});
 	}
 

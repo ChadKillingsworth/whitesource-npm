@@ -47,6 +47,7 @@
     "download": "^4.4.3",
     "glob": "^7.1.1",
     "global-tunnel": "^1.2.0",
+    "parse-yarn-lock": "^1.0.2",
     "prompt": "^0.2.14",
     "request": "^2.81.0",
     "shelljs": "^0.3.0",
