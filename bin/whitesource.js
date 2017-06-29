@@ -207,6 +207,9 @@ cli.main(function (args, options){
 		confPath = args[0];
 	}
 	var confJson = WsHelper.initConf(confPath);
+	if (!confJson.apiKey && process.env.WHITESOURCE_API_KEY) {
+		confJson.apiKey = process.env.WHITESOURCE_API_KEY;
+	}
 	if (!confJson) abortUpdate();
 	isFailOnError = confJson.hasOwnProperty(failOnErrorField) && (confJson.failOnError === true || confJson.failOnError === "true");
 	isForceUpdate = confJson.hasOwnProperty(forceUpdateField) && (confJson.forceUpdate === true || confJson.forceUpdate === "true");
