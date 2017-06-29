@@ -5,7 +5,7 @@ var glob = require("glob");
 
 var packageJson = "package.json";
 var nodeModules = "node_modules";
- var WsNodeReportBuilder = exports;
+var WsNodeReportBuilder = exports;
 exports.constructor = function WsNodeReportBuilder(){};
 
 WsNodeReportBuilder.refitNodes = function(obj){
@@ -258,6 +258,11 @@ WsNodeReportBuilder.traverseYarnData = function(lsDeps, yarnDependencies){
 		const packageSeparatorIndex = depName.lastIndexOf('@');
 		let packageName = depName;
 		const details = yarnDependencies[depName];
+		if (!details.resolved) {
+			cli.info('Missing install url: ' +  depName);
+			continue;
+		}
+
 		if (packageSeparatorIndex > 0) {
 			packageName = depName.substr(0, packageSeparatorIndex);
 		}
@@ -278,6 +283,12 @@ WsNodeReportBuilder.traverseYarnData = function(lsDeps, yarnDependencies){
 		if (hashIndex > 0) {
 			shasum = details.resolved.substr(hashIndex + 1);
 			url = details.resolved.substr(0, hashIndex);
+		} else {
+			const urlParts = /\/tar.gz\/([0-9a-f]+)$/.exec(details.resolved);
+			if (urlParts) {
+				shasum = urlParts[1];
+				url = url.substr(0, url.length - urlParts[1].length - 1);
+			}
 		}
 
 		packageInfo[details.version] = {
@@ -292,11 +303,11 @@ WsNodeReportBuilder.traverseYarnData = function(lsDeps, yarnDependencies){
 	function augmentDepInfo(details, name) {
 		if (name) {
 			if (!(name in yarnDependenciesMap)) {
-				console.error('Missing yarn dependency:', name);
+				cli.info('Missing yarn dependency: ' + name);
 				return;
 			}
 			if (!(details.version in yarnDependenciesMap[name])) {
-				console.error('Missing yarn dependency version:', name, version);
+				cli.info('Missing yarn dependency version: ' + name + ' ' + details.version);
 				return;
 			}
 			
