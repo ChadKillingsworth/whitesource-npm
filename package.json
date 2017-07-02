@@ -1,5 +1,5 @@
 {
-  "name": "whitesource",
+  "name": "@banno/whitesource",
   "version": "1.0.3",
   "description": "Whitesource Node Module",
   "preferGlobal": true,
