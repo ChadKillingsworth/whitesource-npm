@@ -8,7 +8,7 @@ var shell = require('shelljs/global');
 var cli = require('cli');
 var fs = require('fs');
 var checksum = require('checksum');
-var yarnParser = require('parse-yarn-lock');
+var yarnParser = require('@yarnpkg/lockfile');
 
 var prompt = require('prompt');
 prompt.message = "whitesource";
@@ -266,25 +266,24 @@ cli.main(function (args, options){
 			cli.fatal(missingYarnLockMsg);
 		}
 		var yarnLockData = fs.readFileSync('./yarn.lock', {encoding: 'utf8'});
-		yarnParser.parse(yarnLockData, function(err, yarnData) {
-			var cmd = (confJson.devDep === true) ? 'npm ls --json > ./ws-ls.json' : 'npm ls --json --only=prod > ./ws-ls.json';
+		var yarnData = yarnParser.parse(yarnLockData).object;
+		var cmd = (confJson.devDep === true) ? 'npm ls --json > ./ws-ls.json' : 'npm ls --json --only=prod > ./ws-ls.json';
 			exec(cmd,function(error, stdout, stderr){
-				if (error != 0){
-					cli.ok('exec error: ', error);
-					cli.error(devDepMsg);
-					cli.fatal(lsFailMsg);
-				} else {
-					cli.ok('Done calculation dependencies!');
+			if (error != 0){
+				cli.ok('exec error: ', error);
+				cli.error(devDepMsg);
+				cli.fatal(lsFailMsg);
+			} else {
+				cli.ok('Done calculation dependencies!');
 
-					var lsResult = JSON.parse(fs.readFileSync("./ws-ls.json", 'utf8'));
-					var json = WsNodeReportBuilder.traverseYarnData(lsResult, yarnData);
+				var lsResult = JSON.parse(fs.readFileSync("./ws-ls.json", 'utf8'));
+				var json = WsNodeReportBuilder.traverseYarnData(lsResult, yarnData);
 
-					cli.ok("Saving dependencies report");
-					WsHelper.saveReportFile(json,constants.NPM_REPORT_NAME);
+				cli.ok("Saving dependencies report");
+				WsHelper.saveReportFile(json,constants.NPM_REPORT_NAME);
 
-					postReportToWs(json,confJson);
-				}
-			});
+				postReportToWs(json,confJson);
+			}
 		});
 	}
 
