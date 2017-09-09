@@ -1,6 +1,6 @@
 {
   "name": "whitesource",
-  "version": "1.0.3",
+  "version": "1.0.7",
   "description": "Whitesource Node Module",
   "preferGlobal": true,
   "bin": {
@@ -45,6 +45,7 @@
     "checksum": "0.1.1",
     "cli": "^1.0.1",
     "download": "^4.4.3",
+    "findup-sync": "^1.0.0",
     "glob": "^7.1.1",
     "global-tunnel": "^1.2.0",
     "parse-yarn-lock": "^1.0.2",

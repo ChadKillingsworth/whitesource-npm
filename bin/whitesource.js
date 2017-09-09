@@ -21,6 +21,7 @@ var WsNodeReportBuilder = require('./ws_node_report_builder');
 var WsBowerReportBuilder = require('./ws_bower_report_builder');
 var WsPost = require('./ws_post');
 var WsHelper = require('./ws_helper');
+var version = require('./version');
 var runtimeMode = "node";
 var isFailOnError = false;
 var isPolicyViolation = false;
@@ -200,7 +201,8 @@ var buildReport = function(lsJson){
 	return resJson;
 };
 
-
+cli.setApp(constants.APP_NAME, version);
+cli.enable('version');
 cli.parse(null, ['bower','run', 'yarn']);
 cli.main(function (args, options){
 	var confPath = './whitesource.config.json';
@@ -219,6 +221,10 @@ cli.main(function (args, options){
 
 	deletePluginFiles();
 
+	// if(cli.command === "-v"){
+	// 	process.stdout.write(version + '\n');
+	// 	process.exit();
+	// }
 	if(cli.command === "run"){
 		runtimeMode = "node";
 		cli.ok('Running whitesource...');

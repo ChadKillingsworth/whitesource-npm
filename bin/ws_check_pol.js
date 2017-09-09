@@ -3,13 +3,12 @@ exports.constructor = function WsCheckPol(){};
 
 WsCheckPol.check = function(resJson){
 	console.log(resJson);
-	var checkPolSent = false;
 	var existingProjs = resJson.existingProjects;
 	var newProjs = resJson.newProjects;
 	var failBuild = false;
 	var policyDeps = [];
 	var newDeps = [];
-	//check and handle exsiting projects
+	//check and handle existing projects
 	if(existingProjs){
 		for (key in existingProjs) {
 			var projChildren = existingProjs[key].children;
@@ -42,14 +41,6 @@ WsCheckPol.check = function(resJson){
 			cli.info(policyDeps[i].resource.displayName + " : " + policyDeps[i].policy.displayName);
 		}
 	}else{
-/*		finish();
-		return false; //disable checkPolicy.*/
 	   cli.ok("No policy violations found");
-	   if(checkPolSent){
-			//finish();
-	   }else{
-		checkPolSent = true;
-		//postJson()
-	   }
 	}
 };

@@ -5,7 +5,8 @@ var fs = require('fs');
 var cli = require('cli');
 
 var noConfMsg = 'Please create a whitesource.config.json to continue';
-var fileMsg = 'whitesource.config.json is not a valid JSON file';
+var noGivenConf = 'Could not find the file: ';
+var fileMsg = 'Config file is not a valid JSON file';
 
 
 WsHelper.hasFile = function(filePath){
@@ -19,6 +20,10 @@ WsHelper.hasFile = function(filePath){
 
 WsHelper.initConf = function(confPath){
 	 try{
+         if (!fs.existsSync(confPath)) {
+             cli.error(noGivenConf + confPath);
+             return false;
+         }
 		res = fs.readFileSync(confPath, 'utf8',function(err,data){
 			if(!err){
 				cli.error(fileMsg);
@@ -27,10 +32,9 @@ WsHelper.initConf = function(confPath){
 		});	
 		res = JSON.parse(res);
 	}catch(e){
-		cli.error(noConfMsg);
+		cli.error(fileMsg);
 		return false;
 	}
-
 	return res;
 
 };
