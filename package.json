@@ -1,6 +1,6 @@
 {
   "name": "whitesource",
-  "version": "1.0.7",
+  "version": "18.2.1",
   "description": "Whitesource Node Module",
   "preferGlobal": true,
   "bin": {
@@ -25,6 +25,10 @@
     {
       "name": "Asaf Savich",
       "email": "asaf.savich@whitesourcesoftware.com"
+    },
+    {
+      "name": "Raz Nitzan",
+      "email": "raz.nitzan@whitesourcesoftware.com"
     }
   ],
   "licenses": [
@@ -43,12 +47,14 @@
   },
   "dependencies": {
     "@yarnpkg/lockfile": "^1.0.0",
+    "bluebird": "^3.5.1",
     "checksum": "0.1.1",
     "cli": "^1.0.1",
     "download": "^4.4.3",
     "findup-sync": "^1.0.0",
     "glob": "^7.1.1",
     "global-tunnel": "^1.2.0",
+    "mkdirp": "^0.5.1",
     "prompt": "^0.2.14",
     "request": "^2.81.0",
     "shelljs": "^0.3.0",

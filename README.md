@@ -14,4 +14,4 @@
 
 More about the White Source service: [http://www.whitesourcesoftware.com/](http://www.whitesourcesoftware.com/)
 
-View documentation here: [http://docs.whitesourcesoftware.com/display/serviceDocs/NPM+plugin](http://docs.whitesourcesoftware.com/display/serviceDocs/NPM+plugin)
+View documentation here: [https://whitesource.atlassian.net/wiki/spaces/WD/pages/34209870/NPM+Plugin](https://whitesource.atlassian.net/wiki/spaces/WD/pages/34209870/NPM+Plugin)
