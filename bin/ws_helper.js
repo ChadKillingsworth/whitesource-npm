@@ -3,6 +3,7 @@ exports.constructor = function WsHelper(){};
 
 var fs = require('fs');
 var cli = require('cli');
+var constants = require('./constants');
 
 var noConfMsg = 'Please create a whitesource.config.json to continue';
 var noGivenConf = 'Could not find the file: ';
@@ -29,7 +30,7 @@ WsHelper.initConf = function(confPath){
 				cli.error(fileMsg);
 				return false;
 			}
-		});	
+		});
 		res = JSON.parse(res);
 	}catch(e){
 		cli.error(fileMsg);
@@ -39,16 +40,13 @@ WsHelper.initConf = function(confPath){
 
 };
 
-WsHelper.saveReportFile = function(json,filename){
-	try{
-		fs.writeFile("ws-log-" + filename, JSON.stringify(json, null, 4), function(err) {
-		    if(err){
-		      cli.error(err);
-		    }else{}
+WsHelper.saveReportFile = function (json, filename) {
+	return fs.mkdir(constants.LOG_FILES_FOLDER, function () {
+		var path = constants.LOG_FILES_FOLDER + "/ws-log-" + filename;
+		return fs.writeFile(path, JSON.stringify(json, null, 4), function (err) {
+			if (err) cli.error(err);
 		});
-	}catch(e){
-		cli.error(e);
-	}
+	});
 };
 
 WsHelper.cleanJson = function(toClean) {

@@ -15,7 +15,15 @@ module.exports = Object.freeze({
     NPM_RESPONSE_JSON: "response-npm.json",
     NPM_LS_JSON: "ls.json",
 
+    NPM_REGISTRY: "registry.npmjs.org",
+
     POLICY_VIOLATIONS: "policy-violations.json",
+
+    POLICY_REJECTION_SUMMARY: "policyRejectionSummary.json",
+
+    DEFAULT_CONNECTION_DELAY_TIME_MILLISECONDS: 3000,
+
+    LOG_FILES_FOLDER: "WhiteSource-log-files",
 
     APP_NAME: "WhiteSource"
 });
