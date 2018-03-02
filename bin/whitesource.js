@@ -488,22 +488,21 @@ cli.main(function (args, options) {
         });
     }
 
-	if(cli.command === "yarn"){
-		runtimeMode = "node";
-		cli.ok('Running whitesource...');
+	if(cli.command === "yarn") {
+        runtimeMode = "node";
+        cli.ok('Running whitesource V' + version + '...');
 		var hasPackageJson = WsHelper.hasFile('./package.json');
-		if(!hasPackageJson){
+		if(!hasPackageJson) {
 			cli.fatal(missingPackgeJsonMsg);
 		}
-
 		var hasYarnLock = WsHelper.hasFile('./yarn.lock');
-		if(!hasYarnLock){
+		if(!hasYarnLock) {
 			cli.fatal(missingYarnLockMsg);
 		}
-		var yarnLockData = fs.readFileSync('./yarn.lock', {encoding: 'utf8'});
-		var yarnData = yarnParser.parse(yarnLockData).object;
-		var cmd = (confJson.devDep === true) ? 'npm ls --json > ./ws-ls.json' : 'npm ls --json --only=prod > ./ws-ls.json';
-        exec(cmd,function(error, stdout, stderr) {
+        var yarnData = yarnParser.parse(fs.readFileSync('./yarn.lock', 'utf8')).object;
+        var pathOfNpmLsFile = getNpmLsPath();
+		var cmd = (confJson.devDep === true) ? "npm ls --json > " + pathOfNpmLsFile : "npm ls --json --only=prod > " + pathOfNpmLsFile;
+        exec(cmd, function(error, stdout, stderr) {
             if (error != null) {
                 cli.ok('exec error: ', error);
                 cli.error(devDepMsg);
@@ -511,13 +510,13 @@ cli.main(function (args, options) {
             } else {
                 cli.ok('Done calculation dependencies!');
 
-                var lsResult = JSON.parse(fs.readFileSync("./ws-ls.json", 'utf8'));
+                var lsResult = JSON.parse(fs.readFileSync(pathOfNpmLsFile, 'utf8'));
                 var json = WsNodeReportBuilder.traverseYarnData(lsResult, yarnData);
 
                 cli.ok("Saving dependencies report");
-                WsHelper.saveReportFile(json,constants.NPM_REPORT_NAME);
+                WsHelper.saveReportFile(json, constants.NPM_REPORT_NAME);
 
-                postReportToWs(json,confJson);
+                postReportToWs(json, confJson);
             }
         });
 	}

@@ -187,7 +187,7 @@ WsPost.buildRequest = function (report, reqOpt, agent, modJson, confJson) {
 
 
 function postRequest(postUrl, postCallback, isCheckPolicies, postBody, timeout, connectionRetries) {
-    cli.ok((isCheckPolicies ? "Check Policies: " : "Update: ") + "Posting to :" + postUrl);
+    cli.ok((isCheckPolicies ? "Check Policies: " : "Update: ") + "Posting to: " + postUrl);
 
     request.post(postUrl, {timeout: timeout}, function optionalCallback(err, httpResponse, body) {
         if (err && connectionRetries < 1) {
